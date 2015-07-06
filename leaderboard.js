@@ -70,6 +70,25 @@ if(Meteor.isClient) {
     'click. decrement': function(){
       var selectedPlayer = Session.get('selectedPlayer');
       PlayerList.update(selectedPlayer, {$inc: {score: -5} });
+    },
+    'click .remove': function(){
+      var selectedPlayer = Session.get('selectedPlayer');
+      var result = confirm("Want to delete?");
+      if(result){
+        PlayerList.remove(selectedPlayer);
+      }
+    }
+  });
+  Template.addPlayerForm.events({
+    'submit form': function(event, template){
+      event.preventDefault();
+      var playerNameVar = event.target.playerName.value;
+      var playerScoreVar = event.target.playerScore.value;
+      PlayerList.insert({
+        name: playerNameVar,
+        score: playerScoreVar
+      })
+      template.find('form').reset();
     }
   });
 }
