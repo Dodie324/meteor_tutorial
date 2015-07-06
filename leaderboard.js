@@ -7,8 +7,6 @@ a global variable so we can use it throughout all of our project's
 files */
 PlayerList = new Mongo.Collection('players');
 
-console.log("Hello world");
-
 /* Here, we have this Template keyword, which
 searches through the templates inside our
 project, and this leaderboard keyword, which
@@ -24,7 +22,9 @@ if(Meteor.isClient) {
       behavior, so just using .find() is technically the same;
       however, by passing through the curly braces, we can pass
       through a second argument */
-      return PlayerList.find({}, {sort: {score: -1, name: 1} })
+      var currentUserId = Meteor.userId();
+      return PlayerList.find({createdBy: currentUserId},
+                             {sort: {score: -1, name: 1} })
       /* by passing through a value of -1, we can sort in desc order */
     },
     'count': function(){
@@ -84,9 +84,11 @@ if(Meteor.isClient) {
       event.preventDefault();
       var playerNameVar = event.target.playerName.value;
       var playerScoreVar = event.target.playerScore.value;
+      var currentUserId = Meteor.userId();
       PlayerList.insert({
         name: playerNameVar,
-        score: playerScoreVar
+        score: playerScoreVar,
+        createdBy: currentUserId
       })
       template.find('form').reset();
     }

@@ -2,6 +2,7 @@
   <title>Leaderboard</title>
 </head>
 <body>
+  {{> loginButtons}}
   <h1>Leaderboard</h1>
   {{> leaderboard}}
   {{> addPlayerForm}}
@@ -23,9 +24,11 @@
   <!-- Total number of players is {{count}} -->
 </template>
 <template name ="addPlayerForm">
-  <form>
-    <input type="text" name="playerName" placeholder="Player Name">
-    <input type="text" name="playerScore" placeholder="Player Score">
-    <input type="submit" value="Add Player">
-  </form>
+  {{#if currentUser}}
+    <form>
+      <input type="text" name="playerName" placeholder="Player Name">
+      <input type="text" name="playerScore" placeholder="Player Score">
+      <input type="submit" value="Add Player">
+    </form>
+  {{/if}}
 </template>
