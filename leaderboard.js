@@ -5,7 +5,7 @@ in order for us to manipulate it. NOTE how we did not
 use the 'var' keyword; that's because we need to create
 a global variable so we can use it throughout all of our project's
 files */
-PlayerList = new Mongo.Collection('players');
+PlayersList = new Mongo.Collection('players');
 
 /* Here, we have this Template keyword, which
 searches through the templates inside our
@@ -14,21 +14,24 @@ is a reference to the “leaderboard” template.
 The "helpers" keyword allows us to define multiple
 helper functions inside a single block of code*/
 if(Meteor.isClient) {
+  /* opposite to the publish function is the subscribe function
+  which we use to "catch" the data being transmitted from the
+  publish function */
+  Meteor.subscribe('thePlayers');
   Template.leaderboard.helpers({
     'player': function(){
       /* By using the curly braces, we're explicitly
       stating that we want to retrieve all of the data
-      from the PlayerList collection. This is the default
+      from the PlayersList collection. This is the default
       behavior, so just using .find() is technically the same;
       however, by passing through the curly braces, we can pass
       through a second argument */
       var currentUserId = Meteor.userId();
-      return PlayerList.find({createdBy: currentUserId},
-                             {sort: {score: -1, name: 1} })
+      return PlayersList.find({}, {sort: {score: -1, name: 1} })
       /* by passing through a value of -1, we can sort in desc order */
     },
     'count': function(){
-      return PlayerList.find().count()
+      return PlayersList.find().count()
     },
     'selectedClass': function(){
       var playerId = this._id;
@@ -42,7 +45,7 @@ if(Meteor.isClient) {
       /* findOne function will only ever attempt to retrieve
       a single document unlike the find function which would
       look through the entire collection */
-      return PlayerList.findOne(selectedPlayer)
+      return PlayersList.findOne(selectedPlayer)
     }
   });
   Template.leaderboard.events({
@@ -65,17 +68,17 @@ if(Meteor.isClient) {
       we want to change. The $set operator modifies the value of a field
       without deleting the original document; however, the $inc operator
       will increment the score value by 5 */
-      PlayerList.update(selectedPlayer, {$inc: {score: 5} });
+      PlayersList.update(selectedPlayer, {$inc: {score: 5} });
     },
     'click. decrement': function(){
       var selectedPlayer = Session.get('selectedPlayer');
-      PlayerList.update(selectedPlayer, {$inc: {score: -5} });
+      PlayersList.update(selectedPlayer, {$inc: {score: -5} });
     },
     'click .remove': function(){
       var selectedPlayer = Session.get('selectedPlayer');
       var result = confirm("Want to delete?");
       if(result){
-        PlayerList.remove(selectedPlayer);
+        PlayersList.remove(selectedPlayer);
       }
     }
   });
@@ -85,7 +88,7 @@ if(Meteor.isClient) {
       var playerNameVar = event.target.playerName.value;
       var playerScoreVar = event.target.playerScore.value;
       var currentUserId = Meteor.userId();
-      PlayerList.insert({
+      PlayersList.insert({
         name: playerNameVar,
         score: playerScoreVar,
         createdBy: currentUserId
@@ -96,5 +99,11 @@ if(Meteor.isClient) {
 }
 
 if(Meteor.isServer) {
-
+  /* the publish function transmits data into the ether. Note that
+  we only need to define the returned data from the server within
+  this publish function and not anywhere else */
+  Meteor.publish('thePlayers', function(){
+    var currentUserId = this.userId;
+    return PlayersList.find({createdBy: currentUserId})
+  });
 }
