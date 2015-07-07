@@ -1,0 +1,15 @@
+<template name="leaderboard">
+ <!-- All of the documents from the "PlayersList" collection are retrieved based on the reference to the "player" function. We then loop through the returned data with the each syntax. "player" acts as the variable holding the data -->
+  <ul>
+    {{#each player}}
+      <li class="player {{selectedClass}}">{{name}}: {{score}}</li>
+    {{/each}}
+    <input type="button" class="increment" value="Give 5 Points">
+    <input type="button" class="decrement" value="Take 5 Points">
+  </ul>
+  {{#if showSelectedPlayer}}
+    <li>Selected Player: {{showSelectedPlayer.name}}</li>
+  {{/if}}
+  <input type="button" class="remove" value="Remove Player">
+  <!-- Total number of players is {{count}} -->
+</template>
